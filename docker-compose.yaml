@@ -1,0 +1,58 @@
+
+services:
+  gatway:
+    build: ./gatway
+    container_name: gatway
+    ports:
+      - "5000:5000" # optional local binding
+    networks:
+      - micro-network
+    command: npm  run dev
+
+  auth:
+    build: ./auth
+    container_name: auth
+    ports:
+      - "5001:5000" # optional local binding
+    networks:
+      - micro-network
+    command: npm  run dev
+
+  orders:
+    build: ./orders
+    container_name: orders
+    ports:
+      - "5002:5000" # optional local binding
+    networks:
+      - micro-network
+    command: npm  run dev
+
+  products:
+    build: ./products
+    container_name: products
+    ports:
+      - "5003:5000" # optional local binding
+    networks:
+      - micro-network
+    command: npm  run dev
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - gatway
+      - auth
+      - products
+      - orders
+    networks:
+      - micro-network
+
+networks:
+  micro-network:
+    driver: bridge
