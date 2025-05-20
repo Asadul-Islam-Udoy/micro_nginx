@@ -1,8 +1,8 @@
 
 services:
-  gatway:
-    build: ./gatway
-    container_name: gatway
+  gateway:
+    build: ./gateway
+    container_name: gateway
     ports:
       - "5000:5000" # optional local binding
     networks:
@@ -14,6 +14,8 @@ services:
     container_name: auth
     ports:
       - "5001:5000" # optional local binding
+    # environment:
+    #   MONGO_URI: mongodb://mongodb:27017/users_db
     networks:
       - micro-network
     command: npm  run dev
@@ -31,11 +33,40 @@ services:
     build: ./products
     container_name: products
     ports:
-      - "5003:5000" # optional local binding
+      - "50010:5000" # optional local binding
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: micro_products
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
     networks:
       - micro-network
     command: npm  run dev
-
+  postgres:
+    image: postgres:16
+    container_name: postgres
+    environment:
+      POSTGRES_DB: micro_products
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - micro-network
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"     # RabbitMQ messaging
+      - "15672:15672"   # RabbitMQ web UI
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
   nginx:
     image: nginx:latest
     container_name: nginx
@@ -46,7 +77,7 @@ services:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./nginx/ssl:/etc/nginx/ssl:ro
     depends_on:
-      - gatway
+      - gateway
       - auth
       - products
       - orders
@@ -56,3 +87,6 @@ services:
 networks:
   micro-network:
     driver: bridge
+volumes:
+  pgdata:
+  rabbitmq_data:

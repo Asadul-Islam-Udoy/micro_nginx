@@ -1,9 +1,9 @@
 /auth/node_modules
-/getway/node_modules
+/gateway/node_modules
 /orders/node_modules
 /products/node_modules
 
 /auth/.env
-/getway/.env
+/gateway/.env
 /orders/.env
 /products/.env
