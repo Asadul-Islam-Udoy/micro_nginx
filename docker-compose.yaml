@@ -34,12 +34,11 @@ services:
     container_name: products
     ports:
       - "50010:5000" # optional local binding
-    environment:
-      POSTGRES_HOST: postgres
-      POSTGRES_PORT: 5432
-      POSTGRES_DB: micro_products
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: root
+    env_file:
+    - ./products/.env
+    depends_on:
+      - rabbitmq
+      - postgres
     networks:
       - micro-network
     command: npm  run dev
@@ -67,6 +66,9 @@ services:
       RABBITMQ_DEFAULT_PASS: admin
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - micro-network
+    
   nginx:
     image: nginx:latest
     container_name: nginx

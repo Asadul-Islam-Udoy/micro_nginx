@@ -3,7 +3,10 @@ import {Request,Response} from 'express';
 import dotenv from 'dotenv';
 import { DBConnection } from './config/DbConnection';
 import RedisClient from './helper/Redis';
+import { StartCacheConsumer } from './helper/RabbitMq';
 dotenv.config({path:'.env'});
+///rabbitmq
+StartCacheConsumer();
 ///database call
 DBConnection();
 ///redis called
